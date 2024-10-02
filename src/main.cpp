@@ -15,21 +15,27 @@ TwoWire wire;
 
 // Callback function that will be executed when data is received
 void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
-	memcpy(&message, incomingData, sizeof(message));
-	Serial.print("Bytes received: ");
-	Serial.println(len);
-	Serial.print("x: ");
-	Serial.println(message.rot_x);
-	Serial.print("y: ");
-	Serial.println(message.rot_y);
-	Serial.print("z: ");
-	Serial.println(message.rot_z);
-	Serial.println();
+    if(len != sizeof(message)){
+        Serial.println("invalid message size");
+        return;
+    }
 
-    uint wiper =  message.rot_z / M_PI_2 * 127;
-    if (message.rot_z < 0) wiper = 0;
+	memcpy(&message, incomingData, sizeof(message));
+
+    uint wiper =  message.rot_x / M_PI_2 * 127;
+    if (message.rot_x < 0) wiper = 0;
     else if (wiper > 127) wiper = 127;
     ds3502.setWiper(wiper);
+
+    Serial.print("Bytes received: ");
+	Serial.println(len);
+	Serial.print(">x:");
+	Serial.println(message.rot_x);
+	Serial.print(">y:");
+	Serial.println(message.rot_y);
+	Serial.print(">z:");
+	Serial.println(message.rot_z);
+	Serial.println();
 }
 
 void setup() {
